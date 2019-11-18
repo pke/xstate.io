@@ -2,7 +2,10 @@ module.exports = {
   apps: [{
     name: "xstate.io",
     script: "npm",
-    args: "start"
+    args: "start",
+    env: {
+      PORT: 5000
+    }
   }],
   deploy: {
     production: {
