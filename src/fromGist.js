@@ -1,5 +1,5 @@
 const got = require("got")
-const toMachine = require("./toMachine")
+const toMachine = require("./xstate/toMachine")
 
 const basicAuth = process.env.GITHUB_USER && process.env.GITHUB_TOKEN && "Basic "
   + Buffer.from(
@@ -7,7 +7,7 @@ const basicAuth = process.env.GITHUB_USER && process.env.GITHUB_TOKEN && "Basic 
     + ":" + process.env.GITHUB_TOKEN
   ).toString("base64")
 
-// a6d444e7a565341ef666f98a67d1f03e94e242e9
+// ac90dc3ae16d407369c6341f29c2b10c
 async function fromGist(gistId) {
   try {
     const { body } = await got(gistId, {
@@ -23,7 +23,7 @@ async function fromGist(gistId) {
       return machine
     }
   } catch (err) {
-    throw new Error("Download error")
+    throw new Error(`Gist ${gistId} could not be downloaded (${err.statusCode} ${err.statusMessage})`)
   }
 }
 

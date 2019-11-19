@@ -3,90 +3,101 @@ const { URL } = require("url")
 const Koa = require("koa")
 const Router = require("koa-trie-router")
 
-const createStateApp = require("./stateApp")
+const createStateApp = require("./xstate/xstateApp")
+const appUrl = require("./appUrl")
 
 const app = new Koa()
 const router = new Router()
 
 app.context.resourceUrl = function(id, path = "") {
-  return new URL(`/${this.params.app}/${id}${path ? "/".concat(path) : path}`, this.href).href
+  return appUrl(this.params.app, this.href, id, path)
 }
 
-app.use(require("./middleware/errorResponse")())
+const stateAppRoutes = new Router()
+  .use(async (ctx, next) => {
+    const { app, id } = ctx.params
+    let machine
+    if (/^[a-f0-9]{32}$/i.test(app)) {
+      const fromGist = require("./fromGist")
+      machine = await fromGist(app)
+    } else {
+      try {
+        machine = require(`./xstate/${app}`)
+      } catch (err) {
+        ctx.throw(404, `App ${app} not found`, { app })
+      }
+    }
 
-const stateApp = apps => {
-  return new Router()
-    .use(async (ctx, next) => {
-      const app = apps[ctx.params.app]
-      if (!app) {
-        ctx.status = 404
-        ctx.statusText = `App ${ctx.params.app} not found`
-        return
+    ctx.state.model = createStateApp(() => machine)
+
+    if (id) {
+      const found = ctx.state.model.find(id)
+      if (!found) {
+        ctx.throw(`${app} with id ${id} not found`, { app, id })
       }
-      ctx.model = createStateApp(app)
-      if (ctx.params.id) {
-        const found = ctx.model.find(ctx.params.id)
-        if (!found) {
-          ctx.status = 404
-          return
-        }
-        ctx.status = 200
-        ctx.service = found.service
-        ctx.id = found.id
-      }
-      ctx.links = []
-      ctx.actions = []
-      await next()
-    })
-    .get("/:app", ctx => {
-      const form = ctx.model.createForm(ctx.query)
-      ctx.body = {
-        actions: [{
-          name: "create",
-          title: form.title,
-          method: "POST",
-          href: new URL(`/${ctx.params.app}`, ctx.href).href,
-          fields: form.fields
-        }]
-      }
-    })
-    .post("/:app", (ctx) => {
-      const created = ctx.model.create(ctx.query)
-      ctx.id = created.id
-      ctx.service = created.service
-      ctx.status = 201
-    })
-    .put("/:app/:id/:type", async (ctx) => {
-      const event = {
-        type: ctx.params.type,
-        ...ctx.query
-      }
-      if (!ctx.model.validEvent(ctx.service, event)) {
-        ctx.status = 406
-        return
-      }
-      const changed = await ctx.model.send({ id: ctx.id, service: ctx.service}, event)
-      ctx.status = 200
-    })
-    .get("/:app/:id", (ctx) => {
-    })
-    .del("/:app/:id", (ctx) => {
-      ctx.model.del(ctx.id)
-      ctx.status = 204
-      ctx.id = ctx.service = undefined
-    })
-    .middleware()
-}
+      ctx.state.service = found.service
+      ctx.state.id = found.id
+    }
+    await next()
+    if (ctx.state.id) {
+      ctx.state.links.push({
+        rel: ["new", "form"],
+        href: appUrl(app, ctx.href, ctx.state.id)
+      })
+    }
+  })
+  .get("/:app", ctx => {
+    const form = ctx.state.model.contextSchema(ctx.query)
+    ctx.body = {
+      actions: [{
+        name: "create",
+        title: form.title,
+        method: "POST",
+        href: new URL(ctx.params.app, ctx.href).href,
+        fields: form.properties
+      }]
+    }
+  })
+  .post("/:app", ctx => {
+    const created = ctx.state.model.create(ctx.query)
+    ctx.state.id = created.id
+    ctx.state.service = created.service
+    ctx.status = 201
+  })
+  .put("/:app/:id/:type", async ctx => {
+    const event = {
+      type: ctx.params.type,
+      ...ctx.query
+    }
+    if (!ctx.state.model.validEvent(ctx.state.service, event)) {
+      ctx.status = 406
+      return
+    }
+    const changed = await ctx.state.model.send({ id: ctx.state.id, service: ctx.state.service}, event)
+    ctx.status = 200
+  })
+  .get("/:app/:id", ctx => {
+    // Just to define the route. The response is composed by the middleware 
+    // from the instantiated service app by that id
+    ctx.status = 200
+  })
+  .del("/:app/:id", ctx => {
+    ctx.state.model.delete(ctx.id)
+    ctx.state.id = ctx.state.service = undefined
+    ctx.status = 204
+  })
+
 
 router.get("/error", () => {
   throw new Error("Test")
 })
 
+app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/locationResponse")())
 app.use(require("./middleware/sirenResponse")())
-app.use(stateApp(require("./fsm")))
+app.use(stateAppRoutes.middleware())
 app.use(router.middleware())
 
 module.exports = function listen(port) {
-  app.listen(port)
+  return app.listen(port)
 }

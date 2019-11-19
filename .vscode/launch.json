@@ -15,7 +15,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Server",
-      "program": "${workspaceFolder}/src/koaApp.js"
+      "program": "${workspaceFolder}/src/server.js"
     }
   ]
 }

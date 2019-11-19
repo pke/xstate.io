@@ -16,8 +16,11 @@ function toSiren(service, annotate = {}) {
       }
     ],
     actions: current.nextEvents.reduce((actions, event) => {
-      const meta = current.meta[`${service.id}.${current.toStrings()[0]}`] || { on: { [event]: {} } }
-      const { fields, ...rest} = meta.on[event]
+      let meta = current.meta[`${service.id}.${current.toStrings()[0]}`] 
+      if (!meta) {
+        meta =  { on: { [event]: {} } }
+      }
+      const { fields, ...rest} = ((meta.on||{})[event] || {})
       if (Array.isArray(fields) || service.machine.transition(current, event).changed) {
         let action = {
           name: event,

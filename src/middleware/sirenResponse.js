@@ -14,16 +14,17 @@ function isSiren(unknown) {
 
 module.exports = function sirenResponse() {
   return async function(ctx, next) {
+    // Middleware or routes might annotate those
+    ctx.state.links = []
+    ctx.state.actions = []
+
     await next()
-    if (ctx.service && ctx.id !== undefined) {
-      ctx.body = toSiren(ctx.service, {
+
+    if (ctx.state.service && ctx.state.id !== undefined) {
+      ctx.body = toSiren(ctx.state.service, {
         href(path = "") {
-          return ctx.resourceUrl(ctx.id, path)
+          return ctx.resourceUrl(ctx.state.id, path)
         }
-      })
-      ctx.body.links.push({
-        rel: ["new", "form"],
-        href: new URL(`/${ctx.params.app}`, ctx.href).href
       })
     }
     const { body } = ctx

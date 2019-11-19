@@ -1,6 +1,7 @@
 {
+  "spellright.groupDictionaries": false,
   "spellright.language": [
-    "en"
+    "en-GB"
   ],
   "spellright.documentTypes": [
     "markdown",

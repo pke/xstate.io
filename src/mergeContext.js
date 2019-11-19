@@ -1,7 +1,7 @@
 /**
  * Merges two contexts type-safe together
  */
-module.exports = function mergeContexts(base, init) {
+module.exports = function mergeContexts(base = {}, init = {}) {
   return Object.keys(base).reduce((result, key) => {
     const baseValue = base[key]
     if (init[key]) {
