@@ -1,0 +1,4 @@
+files: src/**/*.test.js
+esm: false
+ts: false
+jsx: false

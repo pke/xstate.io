@@ -20,13 +20,23 @@ function toSiren(service, annotate = {}) {
       if (!meta) {
         meta =  { on: { [event]: {} } }
       }
-      const { fields, ...rest} = ((meta.on||{})[event] || {})
+      const { fields, ...rest} = ((meta.on||{})[event] || [])
       if (Array.isArray(fields) || service.machine.transition(current, event).changed) {
         let action = {
           name: event,
           href: annotate.href && annotate.href(event),
           method: "PUT",
-          fields,
+          fields: (fields||[]).map(field => {
+            return Object.keys(field).reduce((field, key) => {
+              const resolver = ((service.machine.options.meta||{}).values||{})[field[key]]
+              if (resolver) {
+                if (typeof resolver === "function") {
+                  field[key] = resolver(current.context)
+                }
+              }
+              return field
+            }, field)
+          }),
           ...rest
         }
         actions.push(action)

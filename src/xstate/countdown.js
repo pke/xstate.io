@@ -45,7 +45,7 @@ module.exports = Machine({
     countdown: assign({ count: context => context.count - 1 })
   },
   delays: {
-    countdown: (context, event) => {
+    countdown: (context) => {
       return context.count * 1000
     }
   }

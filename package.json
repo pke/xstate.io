@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "tap --no-esm --no-ts --no-jsx",
+    "test": "tap",
     "testw": "npm t -- --watch",
     "restart": "pm2 startOrRestart ecosystem.config.js",
     "deploy:setup": "pm2 deploy production setup",
