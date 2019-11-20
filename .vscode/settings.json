@@ -1,12 +1,6 @@
 {
-  "spellright.groupDictionaries": false,
-  "spellright.language": [
-    "en-GB"
-  ],
-  "spellright.documentTypes": [
-    "markdown",
-    "latex",
-    "plaintext",
-    "javascript"
+  "cSpell.language": "en-gb",
+  "cSpell.words": [
+    "xstate"
   ]
 }

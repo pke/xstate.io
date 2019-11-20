@@ -1,5 +1,3 @@
-const { URL } = require("url")
-
 const toSiren = require("../toSiren")
 
 function isSiren(unknown) {

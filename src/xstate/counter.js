@@ -16,19 +16,23 @@ const counterMachine = Machine({
       on: {
         INC: { 
           actions: "inc",
-          cond: notMax,
+          cond: "notMax",
         },
         DEC: { 
           actions: "dec",
-          cond: notMin,
+          cond: "notMin",
         }
       }
     }
   }
 }, {
   actions: {
-    "inc": assign({ count: increment }),
-    "dec": assign({ count: decrement })
+    inc: assign({ count: increment }),
+    dec: assign({ count: decrement })
+  },
+  guards: {
+    notMax,
+    notMin,
   }
 })
 
