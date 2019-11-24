@@ -95,6 +95,7 @@ router.get("/error", () => {
 app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/locationResponse")())
 app.use(require("./middleware/sirenResponse")())
+app.use(require("./routes/bing")(new Router()).middleware())
 app.use(stateAppRoutes.middleware())
 app.use(router.middleware())
 

@@ -24,8 +24,29 @@ Fetches the given gist `machine.js` file and builds it with the given `context` 
 
 Gist: `631ecba85437bb21a24ae86f67595623`
 
-
 ### Problems:
 
-POST response "self" link points to POST original URL (incl query). Shouldn't 
+POST response "self" link points to POST original URL (incl query). Shouldn't
 it point to the resources URL instead?
+
+## `GET /bing/:daysBack?`
+
+Gets the wallpaper of the day from Bing.
+
+| param | description |
+|-------|-------------|
+| `daysBack` | can range from `0..7`. Defaults to `0`|
+
+This can be used in CSS like:
+```css
+html {
+  height: 100vh;
+  width: 100vw;
+}
+body {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-image: url(https://restlr.io/bing)
+}
+```
