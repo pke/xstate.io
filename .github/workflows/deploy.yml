@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -18,8 +17,9 @@ jobs:
     - uses: webfactory/ssh-agent@v0.1.1
       with:
         ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
+    - name: Installing packages
+      run: npm ci
+    - name: Running tests
+      run: npm t      
     - name: Deploying to restlr.io
-      run: |
-        npm ci
-        npm test
-        npm run deploy
+      run: npm run deploy
