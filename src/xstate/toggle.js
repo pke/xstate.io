@@ -6,12 +6,12 @@ const toggleMachine = Machine({
   states: {
     off: {
       on: {
-        ON: "on"
+        TOGGLE: "on"
       }
     },
     on: {
       on: {
-        OFF: "off"
+        TOGGLE: "off"
       }
     }
   }
