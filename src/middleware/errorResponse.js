@@ -8,7 +8,7 @@ module.exports = function() {
         // Let default koa error handler work
         throw err
       }
-      ctx.status = ctx.status <= 299 ? ctx.status : 500
+      ctx.status = ctx.status || 500
       if (!ctx.body && !ctx.headerSent) {
         const Youch = require("youch")
         const youch = new Youch(err, ctx.req)

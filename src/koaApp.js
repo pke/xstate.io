@@ -33,7 +33,7 @@ const stateAppRoutes = new Router()
     if (id) {
       const found = ctx.state.model.find(id)
       if (!found) {
-        ctx.throw(`${app} with id ${id} not found`, { app, id })
+        ctx.throw(404, `${app} with id ${id} not found`, { app, id })
       }
       ctx.state.service = found.service
       ctx.state.id = found.id
@@ -92,6 +92,7 @@ router.get("/error", () => {
   throw new Error("Test")
 })
 
+app.use(require("@koa/cors")())
 app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/locationResponse")())
 app.use(require("./middleware/sirenResponse")())
