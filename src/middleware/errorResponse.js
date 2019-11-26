@@ -16,7 +16,7 @@ module.exports = function() {
           ctx.body = await youch.toHTML()
           ctx.type = "html"
         } else {
-          cty.body = await youch.toJSON()
+          ctx.body = await youch.toJSON()
           ctx.type = "application/json"
         }
       }
