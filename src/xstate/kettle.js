@@ -99,9 +99,9 @@ const kettle = Machine({
   },
   actions: {
     fillWater: assign({
-      amount: (context, event) => context.amount + (event.amount || 0),
+      amount: (context, event) => context.amount + (Number(event.amount) || 0),
       temp: (context, event) => (
-        roundToTwoDigitsAfterComma((context.amount * context.temp + event.amount * event.temp) / (context.amount + event.amount))
+        roundToTwoDigitsAfterComma((context.amount * context.temp + Number(event.amount) * Number(event.temp)) / (context.amount + Number(event.amount)))
       )
     }),
     setStartTime: assign({ startTime: () => Date.now() }),

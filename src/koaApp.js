@@ -67,6 +67,7 @@ const stateAppRoutes = new Router()
   .put("/:app/:id/:type", async ctx => {
     const event = {
       type: ctx.params.type,
+      ...ctx.request.body,
       ...ctx.query
     }
     if (!ctx.state.model.validEvent(ctx.state.service, event)) {
@@ -93,6 +94,7 @@ router.get("/error", () => {
 })
 
 app.use(require("@koa/cors")())
+app.use(require("koa-bodyparser")())
 app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/locationResponse")())
 app.use(require("./middleware/sirenResponse")())
