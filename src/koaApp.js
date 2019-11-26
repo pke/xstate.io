@@ -5,7 +5,6 @@ const Router = require("koa-trie-router")
 
 const createStateApp = require("./xstate/xstateApp")
 const appUrl = require("./appUrl")
-const toSiren = require("./toSiren")
 
 const app = new Koa()
 const router = new Router()
@@ -14,9 +13,9 @@ app.context.resourceUrl = function(id, path = "") {
   return appUrl(this.params.app, this.href, id, path)
 }
 
-const { streamEvents } = require("http-event-stream")
-
 function sampleEvents(ctx) {
+  const { streamEvents } = require("http-event-stream")
+
   const fetchEventsSince = async (lastEventId) => {
     return [ /* all events since event with ID `lastEventId` woud go here */ ]
   }
@@ -28,6 +27,8 @@ function sampleEvents(ctx) {
     stream (stream) {
       const listener = state => {
         if (state.changed) {
+          const toSiren = require("./toSiren")
+
           stream.sendEvent({
             event: "change",
             data: JSON.stringify(toSiren(ctx.state.service, {
@@ -107,7 +108,7 @@ const stateAppRoutes = new Router()
     ctx.respond = false
   })
   .post("/:app", ctx => {
-    const created = ctx.state.model.create(ctx.query)
+    const created = ctx.state.model.create({...ctx.query, ...ctx.request.body})
     ctx.state.id = created.id
     ctx.state.service = created.service
     services[created.id] = created.service
@@ -142,12 +143,15 @@ router.get("/error", () => {
   throw new Error("Test")
 })
 
+app.use(require("./routes/bing")(new Router()).middleware())
+
+console.log("Adding CORS")
 app.use(require("@koa/cors")())
+console.log("Adding bodyparser")
 app.use(require("koa-bodyparser")())
 app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/locationResponse")())
 app.use(require("./middleware/sirenResponse")())
-app.use(require("./routes/bing")(new Router()).middleware())
 app.use(stateAppRoutes.middleware())
 app.use(router.middleware())
 
