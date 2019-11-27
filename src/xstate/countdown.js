@@ -1,6 +1,17 @@
 const { Machine, assign } = require("xstate")
 
-module.exports = Machine({
+const guards = {
+  canCountDown: context => !guards.countedDown(context),
+  countedDown: context => context.count === 0
+}
+
+const actions = {
+  startCounting: assign({ startCount: context => context.count }),
+  reset: assign({ count: context => context.startCount }),
+  countdown: assign({ count: context => context.count - 1 })
+}
+
+const countdownMachine = Machine({
   id: "countdown",
   initial: "idle",
   context: {
@@ -9,23 +20,25 @@ module.exports = Machine({
   states: {
     idle: {
       on: {
-        START: "counting"
+        START: {
+          actions: "startCounting",
+          target: "counting"
+        }
       }
     },
     counting: {
       after: {
-        1000: [
-          { 
-            target: "done",
-            cond: "countedDown"
-          },
-          {
-            target: "counting",
-            actions: "countdown"
-          }
-        ]
+        1000: {
+          target: "counting",
+          actions: "countdown",
+          cond: "canCountDown"
+        }
       },
       on: {
+        "": { 
+          target: "done",
+          cond: "countedDown"
+        },
         STOP: {
           target: "idle",
           actions: "reset"
@@ -33,20 +46,18 @@ module.exports = Machine({
       }
     },
     done: {
-      type: "final"
+      type: "final",
+      on: {
+        RESTART: {
+          target: "counting",
+          actions: "reset"
+        }
+      }
     }
   }
 }, {
-  guards: {
-    countedDown: context => context.count === 1
-  },
-  actions: {
-    reset: assign({ count: 10 }),
-    countdown: assign({ count: context => context.count - 1 })
-  },
-  delays: {
-    countdown: (context) => {
-      return context.count * 1000
-    }
-  }
+  guards,
+  actions
 })
+
+module.exports = countdownMachine
