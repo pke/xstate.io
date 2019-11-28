@@ -12,7 +12,6 @@ module.exports = {
       user: "pke",
       host: "cronos.illunis.net",
       port: "36077",
-      ssh_options: "StrictHostKeyChecking=no",
       ref: "origin/master",
       repo: "git@deployment:pke/xstate.io.git",
       path: "/var/www/restlr.io",
