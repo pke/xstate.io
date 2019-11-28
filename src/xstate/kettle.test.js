@@ -14,6 +14,14 @@ const TEST_CONTEXT = {
   targetTemp: 100
 }
 
+function isAction(t, actions, name, shape) {
+  const action = actions.find(action => action.name === name)
+  if (!action) {
+    t.error(`Action ${name} not found`)
+  }
+  t.same(action.fields, shape)
+}
+
 const createKettle = (context = {}) => (
   interpret(machine.withContext({ ...TEST_CONTEXT, ...context}),
     {
@@ -65,6 +73,41 @@ t.test("kettle", t => {
       t.ok(kettle.state.matches("lidOpen"))
     })
 
+    t.test("SIREN with 2 actions", t => {
+      t.plan(1)
+      const { kettle } = t.context
+      const siren = toSiren(kettle, {
+        href(path) {
+          return "/" + path
+        }
+      })
+      t.same(siren.actions, [
+        {
+          name: "FILL_WATER",
+          href: "/FILL_WATER",
+          method: "PUT",
+          fields: [
+            {
+              name: "amount",
+              type: "number",
+              min: 1,
+              max: 1600
+            }, {
+              name: "temp",
+              type: "number",
+              max: 100
+            }
+          ],
+          title: "Pour water into the kettle"
+        }, 
+        {
+          name: "CLOSE_LID",
+          href: "/CLOSE_LID",
+          method: "PUT",
+          fields: []
+        }])
+    })
+
     t.test("can not start with lid open", t => {
       t.plan(1)
       const { kettle } = t.context
@@ -72,7 +115,7 @@ t.test("kettle", t => {
       t.ok(kettle.state.matches("lidOpen"))
     })
 
-    t.test("pour in water", t => {
+    t.test("fill in water", t => {
       const { kettle } = t.context
       t.plan(2)
       kettle.send({
@@ -85,33 +128,12 @@ t.test("kettle", t => {
       t.is(context.temp, 10)
     })
 
-    t.test("generates SIREN action for filling in water", t => {
-      t.plan(1)
-      const siren = toSiren(t.context.kettle, {
-        href(path) {
-          return "http://localhost/kettle" + path ? ("/" + path) : path
-        }
-      })
-      t.same(siren.actions[0].fields, [
-        {
-          name: "amount",
-          type: "number",
-          min: 1,
-          max: 1600
-        }, {
-          name: "temp",
-          type: "number",
-          max: 100
-        }
-      ])
-    })
-
     t.end()
   })
 
   t.test("can be started with water in it", t => {
     t.plan(1)
-    const kettle = createKettle({ amount: 100 })
+    const kettle = createKettle({ amount: 100, targetTemp: 90 })
     kettle.send("START")
     t.ok(kettle.state.matches("heating"))
   })
@@ -123,13 +145,48 @@ t.test("kettle", t => {
     t.ok(kettle.state.matches("idle"))
   })
 
-  t.test("is done when reaching target temp", t => {
+  t.test("pour water out of it", t => {
+    t.plan(2)
+    const kettle = createKettle({ amount: 100, temp: 10, targetTemp: 100 })
+    kettle.send("POUR_WATER", { amount: 100 })
+    t.ok(kettle.state.changed)
+    t.is(kettle.state.context.amount, 0)
+  })
+
+  t.test("can not pour more water out of it than it carries", t => {
+    t.plan(2)
+    const kettle = createKettle({ amount: 100, temp: 10, targetTemp: 100 })
+    kettle.send("POUR_WATER", { amount: 101 })
+    t.notOk(kettle.state.changed)
+    t.is(kettle.state.context.amount, 100)
+  })
+
+  t.test("generates SIREN action for pouring out water", t => {
+    t.plan(1)
+    const kettle = createKettle({ amount: 100, temp: 10, targetTemp: 90 })
+    const siren = toSiren(kettle, {
+      href(path) {
+        return "/" + path
+      }
+    })
+    isAction(t, siren.actions, "POUR_WATER",[
+      {
+        name: "amount",
+        type: "number",
+        min: 1,
+        max: 100,
+        value: 100
+      }
+    ])
+  })
+
+  t.test("is idle after reaching target temp", t => {
     t.plan(2)
     const kettle = createKettle({ amount: 100, temp: 99, targetTemp: 100 })
     kettle.send("START")
     kettle.clock.increment(300)
     t.is(kettle.state.context.temp, 100)
-    t.is(kettle.state.value, "done")
+    t.is(kettle.state.value, "idle")
   })
 
   t.end()

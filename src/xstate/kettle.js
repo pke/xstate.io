@@ -21,6 +21,9 @@ const roundToTwoDigitsAfterComma = number => (
 const kettle = Machine({
   id: "kettle",
   initial: "idle",
+  meta: {
+    title: "Kettle"
+  },
   context: {
     capacity: 1600, // in millilitre
     power: 2000, // in Watts
@@ -48,7 +51,7 @@ const kettle = Machine({
                 name: "amount",
                 type: "number",
                 min: 1,
-                max: "maxAmount"
+                max: "maxFillAmount"
               },
               {
                 name: "temp",
@@ -67,6 +70,26 @@ const kettle = Machine({
           target: "heating",
           actions: "setStartTime",
           cond: "notEmpty"
+        },
+        POUR_WATER: {
+          actions: "pourWater",
+          cond: "canPourWater"
+        }
+      },
+      meta: {
+        on: {
+          POUR_WATER: {
+            title: "Pour water out of the kettle",
+            fields: [
+              {
+                name: "amount",
+                type: "number",
+                min: 1,
+                max: "maxPourAmount",
+                value: "maxPourAmount"
+              }
+            ]
+          }
         }
       }
     },
@@ -79,30 +102,31 @@ const kettle = Machine({
       },
       on: {
         "": {
-          target: "done",
+          target: "idle",
           cond: "targetTempReached"
         },
         DISCONNECT: "idle",
         LIFT_UP: "idle",
         STOP: "idle"
       }
-    },
-    done: {
-      type: "final"
     }
   }
 }, {
   meta: {
     values: {
-      maxAmount: context => context.capacity - context.amount
+      maxFillAmount: context => context.capacity - context.amount,
+      maxPourAmount: context => context.amount
     }
   },
   actions: {
     fillWater: assign({
-      amount: (context, event) => context.amount + (Number(event.amount) || 0),
+      amount: (context, event) => context.amount + (0 + event.amount),
       temp: (context, event) => (
         roundToTwoDigitsAfterComma((context.amount * context.temp + Number(event.amount) * Number(event.temp)) / (context.amount + Number(event.amount)))
       )
+    }),
+    pourWater: assign({
+      amount: (context, event) => context.amount - event.amount,
     }),
     setStartTime: assign({ startTime: () => Date.now() }),
     incTemp: assign({ temp: context => context.temp + 1 })
@@ -121,9 +145,14 @@ const kettle = Machine({
   },
   guards: {
     validFillEvent: (context, event) => (
-      event.amount > 0
+      context.amount < context.capacity
+      && event.amount > 0
       && event.temp !== undefined
       && context.amount + event.amount <= context.capacity
+    ),
+    canPourWater: (context, event) => (
+      context.amount > 0
+      && event.amount <= context.amount
     ),
     notEmpty: (context) => context.amount > 0,
     targetTempReached: (context) => {
