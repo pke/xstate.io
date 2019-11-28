@@ -40,11 +40,11 @@ jobs:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
-    - name: Adding deploy server to known_hosts
-      run: ssh-keyscan -H -p ${{ env.DEPLOY_SERVER_PORT }} ${{ env.DEPLOY_SERVER }} >> ~/.ssh/known_hosts
     - uses: webfactory/ssh-agent@v0.1.1
       with:
         ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
+    - name: Adding deploy server to known_hosts
+      run: ssh-keyscan -H -p ${{ env.DEPLOY_SERVER_PORT }} ${{ env.DEPLOY_SERVER }} >> ~/.ssh/known_hosts
     - name: Installing pm2
       run: npm i -g pm2
     - name: Deploying restlr.io
