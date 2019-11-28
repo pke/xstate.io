@@ -4,7 +4,7 @@
 module.exports = function mergeContexts(base = {}, init = {}) {
   return Object.keys(base).reduce((result, key) => {
     const baseValue = base[key]
-    if (init[key]) {
+    if (init[key] !== undefined) {
       const baseType = typeof baseValue
       if (baseType === "number") {
         result[key] = Number(init[key]) || result[key]
@@ -17,6 +17,5 @@ module.exports = function mergeContexts(base = {}, init = {}) {
       result[key] = baseValue
     }
     return result
-  },
-  {})
+  }, base)
 }
