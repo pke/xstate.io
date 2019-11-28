@@ -44,7 +44,9 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
     - name: Adding deploy server to known_hosts
-      run: ssh-keyscan -t ecdsa -p ${{ env.DEPLOY_SERVER_PORT }} ${{ env.DEPLOY_SERVER }} >> ~/.ssh/known_hosts
+      run: |
+        ssh-keyscan -t ecdsa -p ${{ env.DEPLOY_SERVER_PORT }} ${{ env.DEPLOY_SERVER }} >> ~/.ssh/known_hosts
+        ssh-keyscan -t ecdsa -p ${{ env.DEPLOY_SERVER_PORT }} 45.10.26.70 >> ~/.ssh/known_hosts
     - name: Installing pm2
       run: npm i -g pm2
     - name: Deploying restlr.io
