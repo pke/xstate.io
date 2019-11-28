@@ -1,7 +1,8 @@
 function toSiren(service, annotate = {}) {
   const current = service.state
   return {
-    title: current.meta.title || current.id,
+    class: service.id,
+    title: current.meta.title || (service.machine.meta && service.machine.meta.title) || current.id,
     properties: current.context,
     links: [
       {
