@@ -16,7 +16,7 @@ module.exports = {
       ref: "origin/master",
       repo: "git@deployment:pke/xstate.io.git",
       path: "/var/www/restlr.io",
-      "post-deploy": "npm ci && pm2 startOrRestart ecosystem.config.js"
+      "post-deploy": "npm ci && npm i -g pm2 && pm2 startOrRestart ecosystem.config.js"
     }
   }
 }
