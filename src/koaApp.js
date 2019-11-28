@@ -16,13 +16,9 @@ app.context.resourceUrl = function(id, path = "") {
 function sampleEvents(ctx) {
   const { streamEvents } = require("http-event-stream")
 
-  const fetchEventsSince = async (lastEventId) => {
-    return [ /* all events since event with ID `lastEventId` woud go here */ ]
-  }
   return streamEvents(ctx.req, ctx.res, {
     async fetch (lastEventId) {
-      // This method is mandatory to replay missed events after a re-connect
-      return fetchEventsSince(lastEventId)
+      return []
     },
     stream (stream) {
       const listener = state => {
@@ -72,15 +68,6 @@ const stateAppRoutes = new Router()
       }
 
       ctx.state.model = createStateApp(() => machine)
-
-      if (id) {
-        const found = ctx.state.model.find(id)
-        if (!found) {
-          ctx.throw(404, `${app} with id ${id} not found`, { app, id })
-        }
-        ctx.state.service = found.service
-        ctx.state.id = found.id
-      }
     }
     await next()
     if (ctx.state.id) {
@@ -120,12 +107,8 @@ const stateAppRoutes = new Router()
       ...ctx.request.body,
       ...ctx.query
     }
-    if (!ctx.state.model.validEvent(ctx.state.service, event)) {
-      ctx.status = 406
-      return
-    }
-    await ctx.state.model.send({ id: ctx.state.id, service: ctx.state.service}, event)
-    ctx.status = 200
+    const newState = await ctx.state.service.send(event)
+    ctx.status = newState.changed ? 200 : 406
   })
   .get("/:app/:id", ctx => {
     // Just to define the route. The response is composed by the middleware 
@@ -136,7 +119,7 @@ const stateAppRoutes = new Router()
     ctx.state.model.delete(ctx.id)
     ctx.state.id = ctx.state.service = undefined
     ctx.status = 204
-  })
+  }).middleware()
 
 
 router.get("/error", () => {
@@ -152,7 +135,7 @@ app.use(require("koa-bodyparser")())
 app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/locationResponse")())
 app.use(require("./middleware/sirenResponse")())
-app.use(stateAppRoutes.middleware())
+app.use(stateAppRoutes)
 app.use(router.middleware())
 
 module.exports = function listen(port) {
