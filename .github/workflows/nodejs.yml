@@ -2,6 +2,9 @@ name: Node CI
 
 on: [push]
 
+env:
+  DEPLOY_SERVER: cronos.illunis.net
+
 jobs:
   build:
 
@@ -24,3 +27,24 @@ jobs:
         npm test
       env:
         CI: true
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: [build]
+    runs-on: [ubuntu-latest]
+    steps:
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Adding ${{ env.DEPLOY_SERVER }} to known_hosts
+      run: ssh-keyscan -t rsa ${{ env.DEPLOY_SERVER }} | ssh-keygen -lf -
+    - uses: webfactory/ssh-agent@v0.1.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
+    - name: Installing pm2
+      run: npm i -g pm2
+    - name: Deploying restlr.io
+      run: pm2 deploy ecosystem.config.js production
