@@ -41,7 +41,7 @@ jobs:
       with:
         fetch-depth: 1
     - name: Adding deploy server to known_hosts
-      run: ssh-keyscan -t rsa -p ${{ env.DEPLOY_SERVER_PORT }} ${{ env.DEPLOY_SERVER }} | ssh-keygen -lf -
+      run: ssh-keyscan -H -p ${{ env.DEPLOY_SERVER_PORT }} ${{ env.DEPLOY_SERVER }} >> ~/.ssh/known_hosts
     - uses: webfactory/ssh-agent@v0.1.1
       with:
         ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
