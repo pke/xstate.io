@@ -3,7 +3,7 @@ module.exports = function() {
     try {
       await next()
     } catch (err) {
-      debugger
+      console.error(err)
       if (process.env.NODE_ENV === "production") {
         // Let default koa error handler work
         throw err
