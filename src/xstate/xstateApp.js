@@ -55,7 +55,8 @@ const createStateApp = createMachine => ({
           ...fieldMeta,
           "default": mergedContext[key],
           type: fieldType(context[key], fieldMeta.type),
-          name: key
+          name: key,
+          value: context[key]
         }
       })
     }
@@ -75,12 +76,7 @@ const createStateApp = createMachine => ({
   delete(id) {
     removeState(id)
   },
-  
-  validEvent(service, event) {
-    const type = event.type || event
-    return service.state.nextEvents.indexOf(type) !== -1 && service.machine.transition(service.state, event).changed
-  },
-  
+
   async send({ id, service }, event) {
     const newState = await service.send(event)
     if (newState.changed) {
