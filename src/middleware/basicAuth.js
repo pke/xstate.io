@@ -3,7 +3,6 @@
 const protected = {}
 
 function addProtection(url, digest) {
-  console.log("Adding", url, "to protected")
   protected[url] = digest
 }
 
