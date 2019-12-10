@@ -128,9 +128,7 @@ router.get("/error", () => {
 
 app.use(require("./routes/bing")(new Router()).middleware())
 
-console.log("Adding CORS")
 app.use(require("@koa/cors")())
-console.log("Adding bodyparser")
 app.use(require("koa-bodyparser")())
 app.use(require("./middleware/errorResponse")())
 app.use(require("./middleware/basicAuth")())

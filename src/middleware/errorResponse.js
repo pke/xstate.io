@@ -3,7 +3,7 @@ module.exports = function() {
     try {
       await next()
     } catch (error) {
-      console.error(error)
+      //console.error(error)
       ctx.status = error.status || ctx.status || 500
       ctx.response.headers = {
         ...ctx.response.headers,
