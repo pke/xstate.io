@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "tap",
+    "test:all": "nve 13 12 10 8 npm test",
     "testw": "npm t -- --watch",
     "restart": "pm2 startOrRestart ecosystem.config.js",
     "deploy:setup": "pm2 deploy ecosystem.config.js production setup",
@@ -32,12 +33,13 @@
     "youch": "2.0.10"
   },
   "devDependencies": {
-    "@commitlint/cli": "^8.2.0",
-    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/cli": "8.2.0",
+    "@commitlint/config-conventional": "8.2.0",
     "eslint": "6.6.0",
     "eslint-plugin-node": "10.0.0",
-    "husky": "^3.1.0",
+    "husky": "3.1.0",
+    "nve": "8.3.0",
     "supertest": "4.0.2",
-    "tap": "14.9.2"
+    "tap": "14.10.2"
   }
 }
