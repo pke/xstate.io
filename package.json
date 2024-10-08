@@ -30,7 +30,7 @@
     "pm2": "5.0.0",
     "polka": "1.0.0-next.7",
     "xstate": "4.6.7",
-    "youch": "2.0.10"
+    "youch": "3.3.4"
   },
   "devDependencies": {
     "@commitlint/cli": "8.2.0",
