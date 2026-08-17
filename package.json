@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "tap",
-    "test:all": "nve 13 12 10 8 npm test",
+    "test:all": "nve 24,22 npm test",
     "testw": "npm t -- --watch",
     "restart": "pm2 startOrRestart ecosystem.config.js",
     "deploy:setup": "pm2 deploy ecosystem.config.js production setup",
@@ -16,30 +16,42 @@
   "author": "Philipp Kursawe <phil.kursawe@gmail.com> (https://pke.github.io/)",
   "license": "MIT",
   "dependencies": {
-    "@koa/cors": "2.2.3",
-    "@polka/send": "1.0.0-next.7",
-    "fast-xml-parser": "3.15.0",
-    "got": "9.6.0",
+    "@koa/cors": "5.0.0",
+    "@polka/send": "0.4.0",
+    "fast-xml-parser": "5.7.0",
+    "got": "11.8.6",
     "http-event-stream": "0.2.0",
-    "koa": "2.11.0",
-    "koa-bodyparser": "4.2.1",
+    "koa": "2.16.4",
+    "koa-bodyparser": "4.4.1",
     "koa-compose": "4.1.0",
-    "koa-mount": "4.0.0",
+    "koa-mount": "4.2.0",
     "koa-no-trailing-slash": "2.1.0",
     "koa-trie-router": "2.1.7",
-    "pm2": "5.0.0",
-    "polka": "1.0.0-next.7",
-    "xstate": "4.6.7",
-    "youch": "2.0.10"
+    "pm2": "7.0.3",
+    "polka": "0.5.2",
+    "xstate": "4.38.3",
+    "youch": "2.2.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "8.2.0",
-    "@commitlint/config-conventional": "8.2.0",
-    "eslint": "6.6.0",
-    "eslint-plugin-node": "10.0.0",
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
+    "eslint": "8.57.1",
+    "eslint-plugin-node": "11.1.0",
     "husky": "3.1.0",
-    "nve": "8.3.0",
-    "supertest": "4.0.2",
-    "tap": "14.10.2"
+    "nve": "18.0.3",
+    "supertest": "7.2.2",
+    "tap": "18.8.0"
+  },
+  "overrides": {
+    "eslint-plugin-node": {
+      "brace-expansion": "1.1.18",
+      "semver": "6.3.1"
+    },
+    "husky": {
+      "semver": "5.7.2"
+    },
+    "youch": {
+      "cookie": "0.7.2"
+    }
   }
 }

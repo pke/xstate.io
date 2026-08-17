@@ -8,7 +8,7 @@ t.test("server tests", t => {
   const server = listen()
 
   // Before ending the tests, close the server and free the port
-  t.tearDown(() => server.close())
+  t.teardown(() => server.close())
 
   t.test("create counter with basic auth", async t => {
     const { headers } = await request(server)

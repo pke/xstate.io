@@ -1,5 +1,3 @@
-files: src/**/*.test.js
-esm: false
-ts: false
-jsx: false
-reporter: spec
+files:
+  - src/**/*.test.js
+allow-incomplete-coverage: true
