@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "tap",
-    "test:all": "nve 13 12 10 8 npm test",
+    "test:all": "nve 24,22 npm test",
     "testw": "npm t -- --watch",
     "restart": "pm2 startOrRestart ecosystem.config.js",
     "deploy:setup": "pm2 deploy ecosystem.config.js production setup",
