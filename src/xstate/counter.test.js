@@ -6,7 +6,7 @@ const listen = require("../koaApp")
 t.test("counter", t => {
   const server = listen()
 
-  t.tearDown(() => server.close())
+  t.teardown(() => server.close())
 
   t.test("create default counter", async t => {
     await request(server)

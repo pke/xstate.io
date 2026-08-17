@@ -14,7 +14,7 @@
     },
     "rules": {
         "require-atomic-updates": [
-            "disabled"
+            "off"
         ],
         "indent": [
             "warn",

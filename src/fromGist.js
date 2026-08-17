@@ -11,8 +11,8 @@ const basicAuth = process.env.GITHUB_USER && process.env.GITHUB_TOKEN && "Basic 
 async function fromGist(gistId) {
   try {
     const { body } = await got(gistId, {
-      baseUrl: "https://api.github.com/gists/",
-      json: true,
+      prefixUrl: "https://api.github.com/gists/",
+      responseType: "json",
       headers: basicAuth && {
         "Authorization": basicAuth
       }
