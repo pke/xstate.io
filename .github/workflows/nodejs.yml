@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js 10.x
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v4
+    - name: Use Node.js 24.x
+      uses: actions/setup-node@v4
       with:
-        node-version: '10.x'
+        node-version: '24.x'
     - name: npm install, build, and test
       run: |
         npm ci
@@ -30,10 +30,10 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
     - name: Setup Node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
-        node-version: '10.x'
-    - uses: actions/checkout@v1
+        node-version: '24.x'
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 1
     - uses: webfactory/ssh-agent@v0.1.1
