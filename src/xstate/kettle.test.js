@@ -31,14 +31,12 @@ const createKettle = (context = {}) => (
 )
 
 t.test("kettle", t => {
-  t.beforeEach((done, t) => {
+  t.beforeEach(t => {
     t.context.kettle = createKettle().start()
-    done()
   })
 
-  t.afterEach((done, t) => {
+  t.afterEach(t => {
     t.context.kettle.stop()
-    done()
   })
 
   t.test("should start in idle mode", t => {
@@ -62,9 +60,8 @@ t.test("kettle", t => {
 
   t.test("open lid", t => {
 
-    t.beforeEach((done, t) => {
+    t.beforeEach(t => {
       t.context.kettle.send("OPEN_LID")
-      done()
     })
 
     t.test("lid is open", t => {
@@ -124,8 +121,8 @@ t.test("kettle", t => {
         temp: 10
       })
       const { context } = kettle.state
-      t.is(context.amount, 1000)
-      t.is(context.temp, 10)
+      t.equal(context.amount, 1000)
+      t.equal(context.temp, 10)
     })
 
     t.end()
@@ -150,7 +147,7 @@ t.test("kettle", t => {
     const kettle = createKettle({ amount: 100, temp: 10, targetTemp: 100 })
     kettle.send("POUR_WATER", { amount: 100 })
     t.ok(kettle.state.changed)
-    t.is(kettle.state.context.amount, 0)
+    t.equal(kettle.state.context.amount, 0)
   })
 
   t.test("can not pour more water out of it than it carries", t => {
@@ -158,7 +155,7 @@ t.test("kettle", t => {
     const kettle = createKettle({ amount: 100, temp: 10, targetTemp: 100 })
     kettle.send("POUR_WATER", { amount: 101 })
     t.notOk(kettle.state.changed)
-    t.is(kettle.state.context.amount, 100)
+    t.equal(kettle.state.context.amount, 100)
   })
 
   t.test("generates SIREN action for pouring out water", t => {
@@ -185,8 +182,8 @@ t.test("kettle", t => {
     const kettle = createKettle({ amount: 100, temp: 99, targetTemp: 100 })
     kettle.send("START")
     kettle.clock.increment(300)
-    t.is(kettle.state.context.temp, 100)
-    t.is(kettle.state.value, "idle")
+    t.equal(kettle.state.context.temp, 100)
+    t.equal(kettle.state.value, "idle")
   })
 
   t.end()
