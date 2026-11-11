@@ -18,7 +18,7 @@
   "dependencies": {
     "@koa/cors": "5.0.0",
     "@polka/send": "1.0.0-next.7",
-    "fast-xml-parser": "5.7.0",
+    "fast-xml-parser": "5.12.0",
     "got": "11.8.6",
     "http-event-stream": "0.2.0",
     "koa": "2.16.4",
